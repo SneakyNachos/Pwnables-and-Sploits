@@ -1,0 +1,41 @@
+Made for the example provided from https://github.com/struct/mms
+*Remember to look through the slides they provide as they do discuss some of the bugs/vulnerabilities that are throughout the examples
+
+Compiled with Visual Studio 2017 via the "win_compile.bat" file in the directory.
+
+Target: Windows 7 x86
+
+Goal:
+Fix bugs that prevent the program from running, choose and keep vulnerabilities that will allow code execution.
+*Sort of like two games in one really.
+
+Notes:
+I added my fixed version of the ipc_recv.cpp as "ipc_recv_fixed.cpp" if you wish to skip to the exploit part. 
+
+How-to-Run:
+ipc_recv.exe obj
+*This will create a shared memory channel called obj
+
+Exploit Script How-to-Run:
+createData.py <command>
+
+CommandList:
+validate: Must validate before continuing
+blob: Code execution bug
+set_key: Sets Crypto key
+get_key: Gets Crypto key
+dump_data: Used to grab data
+crypto_set_key: Test of the crash
+ping: Leap of the heap in PING
+get_heap_leak: combine with ping to get the base pointer of the current top of the heap
+read_file: Read file setup for the IPC shared memory
+write_file: Write file setup for the IPC shared memory
+rop: Creates the rop payload to pop calc.exe on the target
+check: Checks to see if the shared memory channel is open
+
+Tools:
+cscope
+windbg
+IDA
+idasploit
+
