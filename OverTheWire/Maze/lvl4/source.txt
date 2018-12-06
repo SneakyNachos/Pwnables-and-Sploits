@@ -1,0 +1,41 @@
+
+int main(int argc, const char ** argv, const char ** envp){
+	
+	if argc != 2{
+		printf(format,argv[0])
+		_exit(0xffffffff)
+	}
+
+	[esp+0x2ch] = _open(argv[1])
+	if(![esp+0x2ch]){
+		_perror(s)
+		_exit(0xffffffff)
+	}
+	
+	if(!stat_0(argv[1],[esp+50h]){
+		_perror("stat")
+		_exit(0xffffffff)
+	}
+
+	_read([esp+2ch],[esp+A8h],52)
+
+	_lseek([esp+2ch],[esp+0C4h],0)
+
+	_read([esp+2ch],[esp+30h],32)
+	
+	edx = [esp+3Ch]
+	ecx = byte ptr [esp+AFh]
+	eax = byte ptr [esp+B0h]
+
+	eax = eax * ecx
+	if(edx == eax){
+		if([esp+7Ch] == 'w'){
+			_puts(aValidFileExecu)
+			_execv(argv[1],0)
+		}
+	}
+	
+	_fwrite("file not executed",1,0x12,__bss_start)
+	_close(esp+2Ch)
+	return 0
+}

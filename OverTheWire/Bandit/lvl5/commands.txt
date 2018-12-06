@@ -1,0 +1,1 @@
+find /home/bandit5/ -type f -size 1033c -exec ls {} \;

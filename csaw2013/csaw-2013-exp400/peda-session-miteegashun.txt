@@ -1,0 +1,12 @@
+break * 0x8048fcc
+  commands
+    c
+  end
+break * 0x8048fe2
+  commands
+    c
+  end
+break * 0x8048f8e
+  commands
+  end
+

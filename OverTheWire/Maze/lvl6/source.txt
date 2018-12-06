@@ -1,0 +1,19 @@
+int main(int argc, const char **argv, const char **envp){
+	if(argc != 3){
+		_printf(format, argv[0])
+		_exit(0xffffffff)
+	}
+
+	[esp+11Ch] = _fopen(argv[1],"a")
+	if([esp+11Ch] == 0){
+		_perror("fopen")
+		_exit(0xffffffff)
+	}
+
+	_strcpy([esp+1Ch],argv[2])
+
+	_memfrob([esp+1Ch],strlen([esp+1Ch]))
+	
+	_fprintf([esp+11Ch],"%s: %s\n",argv[1],[esp+1Ch])
+	_exit(0)
+}

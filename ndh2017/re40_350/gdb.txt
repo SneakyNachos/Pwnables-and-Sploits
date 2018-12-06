@@ -1,0 +1,420 @@
+Breakpoint 1 at 0x400881
+Breakpoint 2 at 0x4007c9
+Breakpoint 3 at 0x4008ce
+Breakpoint 4 at 0x4008d8
+Breakpoint 5 at 0x4008eb
+Breakpoint 6 at 0x400856
+
+Breakpoint 2, 0x00000000004007c9 in ?? ()
+
+Breakpoint 6, 0x0000000000400856 in ?? ()
+
+Breakpoint 1, 0x0000000000400881 in ?? ()
+
+Breakpoint 5, 0x00000000004008eb in ?? ()
+
+Breakpoint 5, 0x00000000004008eb in ?? ()
+
+Breakpoint 5, 0x00000000004008eb in ?? ()
+
+Breakpoint 5, 0x00000000004008eb in ?? ()
+
+Breakpoint 5, 0x00000000004008eb in ?? ()
+
+Breakpoint 5, 0x00000000004008eb in ?? ()
+
+Breakpoint 5, 0x00000000004008eb in ?? ()
+
+Breakpoint 5, 0x00000000004008eb in ?? ()
+[Inferior 1 (process 4135) exited normally]
+(gdb) quit
+Breakpoint 1 at 0x400881
+Breakpoint 2 at 0x4007c9
+Breakpoint 3 at 0x4008ce
+Breakpoint 4 at 0x4008d8
+Breakpoint 5 at 0x4008eb
+Breakpoint 6 at 0x400856
+Breakpoint 1 at 0x400881
+Breakpoint 2 at 0x4007c9
+Breakpoint 3 at 0x4008ce
+Breakpoint 4 at 0x4008d8
+Breakpoint 5 at 0x4008eb
+Breakpoint 6 at 0x400856
+
+Breakpoint 2, 0x00000000004007c9 in ?? ()
+
+Breakpoint 6, 0x0000000000400856 in ?? ()
+
+Breakpoint 1, 0x0000000000400881 in ?? ()
+
+Breakpoint 5, 0x00000000004008eb in ?? ()
+Breakpoint 1 at 0x400881
+Breakpoint 2 at 0x4007c9
+Breakpoint 3 at 0x4008ce
+Breakpoint 4 at 0x4008d8
+Breakpoint 5 at 0x4008eb
+Breakpoint 6 at 0x400856
+
+Breakpoint 2, 0x00000000004007c9 in ?? ()
+
+Breakpoint 6, 0x0000000000400856 in ?? ()
+
+Breakpoint 1, 0x0000000000400881 in ?? ()
+
+Breakpoint 5, 0x00000000004008eb in ?? ()
+Breakpoint 1 at 0x400881
+Breakpoint 2 at 0x4007c9
+Breakpoint 3 at 0x4008ce
+Breakpoint 4 at 0x4008d8
+Breakpoint 5 at 0x4008eb
+Breakpoint 6 at 0x400856
+
+Breakpoint 2, 0x00000000004007c9 in ?? ()
+
+Breakpoint 6, 0x0000000000400856 in ?? ()
+
+Breakpoint 1, 0x0000000000400881 in ?? ()
+
+Breakpoint 5, 0x00000000004008eb in ?? ()
+Breakpoint 1 at 0x400881
+Breakpoint 2 at 0x4007c9
+Breakpoint 3 at 0x4008ce
+Breakpoint 4 at 0x4008d8
+Breakpoint 5 at 0x4008eb
+Breakpoint 6 at 0x400856
+
+Breakpoint 2, 0x00000000004007c9 in ?? ()
+
+Breakpoint 6, 0x0000000000400856 in ?? ()
+
+Breakpoint 1, 0x0000000000400881 in ?? ()
+
+Breakpoint 5, 0x00000000004008eb in ?? ()
+
+Breakpoint 5, 0x00000000004008eb in ?? ()
+
+Breakpoint 5, 0x00000000004008eb in ?? ()
+
+Breakpoint 5, 0x00000000004008eb in ?? ()
+
+Breakpoint 5, 0x00000000004008eb in ?? ()
+
+Breakpoint 5, 0x00000000004008eb in ?? ()
+Breakpoint 1 at 0x400881
+Breakpoint 2 at 0x4007c9
+Breakpoint 3 at 0x4008ce
+Breakpoint 4 at 0x4008d8
+Breakpoint 5 at 0x4008eb
+Breakpoint 6 at 0x400856
+
+Breakpoint 2, 0x00000000004007c9 in ?? ()
+
+Breakpoint 6, 0x0000000000400856 in ?? ()
+
+Breakpoint 1, 0x0000000000400881 in ?? ()
+
+Breakpoint 5, 0x00000000004008eb in ?? ()
+
+Breakpoint 5, 0x00000000004008eb in ?? ()
+
+Breakpoint 5, 0x00000000004008eb in ?? ()
+
+Breakpoint 5, 0x00000000004008eb in ?? ()
+
+Breakpoint 5, 0x00000000004008eb in ?? ()
+
+Breakpoint 5, 0x00000000004008eb in ?? ()
+
+Breakpoint 5, 0x00000000004008eb in ?? ()
+
+Breakpoint 5, 0x00000000004008eb in ?? ()
+[Inferior 1 (process 4225) exited normally]
+(gdb) Breakpoint 1 at 0x400881
+Breakpoint 2 at 0x4007c9
+Breakpoint 3 at 0x4008ce
+Breakpoint 4 at 0x4008d8
+Breakpoint 5 at 0x4008eb
+Breakpoint 6 at 0x400856
+
+Breakpoint 2, 0x00000000004007c9 in ?? ()
+
+Breakpoint 6, 0x0000000000400856 in ?? ()
+
+Breakpoint 1, 0x0000000000400881 in ?? ()
+
+Breakpoint 5, 0x00000000004008eb in ?? ()
+
+Breakpoint 5, 0x00000000004008eb in ?? ()
+
+Breakpoint 5, 0x00000000004008eb in ?? ()
+
+Breakpoint 5, 0x00000000004008eb in ?? ()
+
+Breakpoint 5, 0x00000000004008eb in ?? ()
+
+Breakpoint 5, 0x00000000004008eb in ?? ()
+
+Breakpoint 5, 0x00000000004008eb in ?? ()
+
+Breakpoint 5, 0x00000000004008eb in ?? ()
+[Inferior 1 (process 4243) exited normally]
+(gdb) quit
+Breakpoint 1 at 0x400881
+Breakpoint 2 at 0x4007c9
+Breakpoint 3 at 0x4008ce
+Breakpoint 4 at 0x4008d8
+Breakpoint 5 at 0x4008eb
+Breakpoint 6 at 0x400856
+
+Breakpoint 2, 0x00000000004007c9 in ?? ()
+
+Breakpoint 6, 0x0000000000400856 in ?? ()
+
+Breakpoint 1, 0x0000000000400881 in ?? ()
+
+Breakpoint 5, 0x00000000004008eb in ?? ()
+
+Breakpoint 5, 0x00000000004008eb in ?? ()
+
+Breakpoint 5, 0x00000000004008eb in ?? ()
+
+Breakpoint 5, 0x00000000004008eb in ?? ()
+
+Breakpoint 5, 0x00000000004008eb in ?? ()
+
+Breakpoint 5, 0x00000000004008eb in ?? ()
+
+Breakpoint 5, 0x00000000004008eb in ?? ()
+
+Breakpoint 5, 0x00000000004008eb in ?? ()
+Breakpoint 1 at 0x400881
+Breakpoint 2 at 0x4007c9
+Breakpoint 3 at 0x4008ce
+Breakpoint 4 at 0x4008d8
+Breakpoint 5 at 0x4008eb
+Breakpoint 6 at 0x400856
+
+Breakpoint 2, 0x00000000004007c9 in ?? ()
+
+Breakpoint 6, 0x0000000000400856 in ?? ()
+
+Breakpoint 1, 0x0000000000400881 in ?? ()
+
+Breakpoint 5, 0x00000000004008eb in ?? ()
+
+Breakpoint 5, 0x00000000004008eb in ?? ()
+
+Breakpoint 5, 0x00000000004008eb in ?? ()
+
+Breakpoint 5, 0x00000000004008eb in ?? ()
+
+Breakpoint 5, 0x00000000004008eb in ?? ()
+
+Breakpoint 5, 0x00000000004008eb in ?? ()
+
+Breakpoint 5, 0x00000000004008eb in ?? ()
+
+Breakpoint 5, 0x00000000004008eb in ?? ()
+Breakpoint 1 at 0x400881
+Breakpoint 2 at 0x4007c9
+Breakpoint 3 at 0x4008ce
+Breakpoint 4 at 0x4008d8
+Breakpoint 5 at 0x4008eb
+Breakpoint 6 at 0x400856
+
+Breakpoint 2, 0x00000000004007c9 in ?? ()
+
+Breakpoint 6, 0x0000000000400856 in ?? ()
+
+Breakpoint 1, 0x0000000000400881 in ?? ()
+
+Breakpoint 5, 0x00000000004008eb in ?? ()
+
+Breakpoint 5, 0x00000000004008eb in ?? ()
+
+Breakpoint 5, 0x00000000004008eb in ?? ()
+
+Breakpoint 5, 0x00000000004008eb in ?? ()
+
+Breakpoint 5, 0x00000000004008eb in ?? ()
+
+Breakpoint 5, 0x00000000004008eb in ?? ()
+
+Breakpoint 5, 0x00000000004008eb in ?? ()
+
+Breakpoint 5, 0x00000000004008eb in ?? ()
+Breakpoint 1 at 0x400881
+Breakpoint 2 at 0x4007c9
+Breakpoint 3 at 0x4008ce
+Breakpoint 4 at 0x4008d8
+Breakpoint 5 at 0x4008eb
+Breakpoint 6 at 0x400856
+
+Breakpoint 2, 0x00000000004007c9 in ?? ()
+
+Breakpoint 6, 0x0000000000400856 in ?? ()
+
+Breakpoint 1, 0x0000000000400881 in ?? ()
+
+Breakpoint 5, 0x00000000004008eb in ?? ()
+
+Breakpoint 5, 0x00000000004008eb in ?? ()
+
+Breakpoint 5, 0x00000000004008eb in ?? ()
+
+Breakpoint 5, 0x00000000004008eb in ?? ()
+
+Breakpoint 5, 0x00000000004008eb in ?? ()
+
+Breakpoint 5, 0x00000000004008eb in ?? ()
+
+Breakpoint 5, 0x00000000004008eb in ?? ()
+
+Breakpoint 5, 0x00000000004008eb in ?? ()
+Breakpoint 1 at 0x400881
+Breakpoint 2 at 0x4007c9
+Breakpoint 3 at 0x4008ce
+Breakpoint 4 at 0x4008d8
+Breakpoint 5 at 0x4008eb
+Breakpoint 6 at 0x400856
+
+Breakpoint 2, 0x00000000004007c9 in ?? ()
+
+Breakpoint 6, 0x0000000000400856 in ?? ()
+
+Breakpoint 1, 0x0000000000400881 in ?? ()
+
+Breakpoint 5, 0x00000000004008eb in ?? ()
+
+Breakpoint 5, 0x00000000004008eb in ?? ()
+
+Breakpoint 5, 0x00000000004008eb in ?? ()
+
+Breakpoint 5, 0x00000000004008eb in ?? ()
+
+Breakpoint 5, 0x00000000004008eb in ?? ()
+
+Breakpoint 5, 0x00000000004008eb in ?? ()
+
+Breakpoint 5, 0x00000000004008eb in ?? ()
+
+Breakpoint 5, 0x00000000004008eb in ?? ()
+Breakpoint 1 at 0x400881
+Breakpoint 2 at 0x4007c9
+Breakpoint 3 at 0x4008ce
+Breakpoint 4 at 0x4008d8
+Breakpoint 5 at 0x4008eb
+Breakpoint 6 at 0x400856
+
+Breakpoint 2, 0x00000000004007c9 in ?? ()
+
+Breakpoint 6, 0x0000000000400856 in ?? ()
+
+Breakpoint 1, 0x0000000000400881 in ?? ()
+
+Breakpoint 5, 0x00000000004008eb in ?? ()
+
+Breakpoint 5, 0x00000000004008eb in ?? ()
+
+Breakpoint 5, 0x00000000004008eb in ?? ()
+
+Breakpoint 5, 0x00000000004008eb in ?? ()
+
+Breakpoint 5, 0x00000000004008eb in ?? ()
+
+Breakpoint 5, 0x00000000004008eb in ?? ()
+
+Breakpoint 5, 0x00000000004008eb in ?? ()
+
+Breakpoint 5, 0x00000000004008eb in ?? ()
+[Inferior 1 (process 4334) exited normally]
+(gdb) quit
+Breakpoint 1 at 0x400881
+Breakpoint 2 at 0x4007c9
+Breakpoint 3 at 0x4008ce
+Breakpoint 4 at 0x4008d8
+Breakpoint 5 at 0x4008eb
+Breakpoint 6 at 0x400856
+
+Breakpoint 2, 0x00000000004007c9 in ?? ()
+
+Breakpoint 6, 0x0000000000400856 in ?? ()
+
+Breakpoint 1, 0x0000000000400881 in ?? ()
+
+Breakpoint 5, 0x00000000004008eb in ?? ()
+
+Breakpoint 5, 0x00000000004008eb in ?? ()
+
+Breakpoint 5, 0x00000000004008eb in ?? ()
+
+Breakpoint 5, 0x00000000004008eb in ?? ()
+
+Breakpoint 5, 0x00000000004008eb in ?? ()
+
+Breakpoint 5, 0x00000000004008eb in ?? ()
+
+Breakpoint 5, 0x00000000004008eb in ?? ()
+
+Breakpoint 5, 0x00000000004008eb in ?? ()
+[Inferior 1 (process 4356) exited normally]
+(gdb) quit
+Breakpoint 1 at 0x400881
+Breakpoint 2 at 0x4007c9
+Breakpoint 3 at 0x4008ce
+Breakpoint 4 at 0x4008d8
+Breakpoint 5 at 0x4008eb
+Breakpoint 6 at 0x400856
+
+Breakpoint 2, 0x00000000004007c9 in ?? ()
+
+Breakpoint 6, 0x0000000000400856 in ?? ()
+
+Breakpoint 1, 0x0000000000400881 in ?? ()
+
+Breakpoint 5, 0x00000000004008eb in ?? ()
+
+Breakpoint 5, 0x00000000004008eb in ?? ()
+
+Breakpoint 5, 0x00000000004008eb in ?? ()
+
+Breakpoint 5, 0x00000000004008eb in ?? ()
+
+Breakpoint 5, 0x00000000004008eb in ?? ()
+
+Breakpoint 5, 0x00000000004008eb in ?? ()
+
+Breakpoint 5, 0x00000000004008eb in ?? ()
+
+Breakpoint 5, 0x00000000004008eb in ?? ()
+[Inferior 1 (process 4377) exited normally]
+(gdb) quit
+Breakpoint 1 at 0x400881
+Breakpoint 2 at 0x4007c9
+Breakpoint 3 at 0x4008d8
+Breakpoint 4 at 0x4008eb
+Breakpoint 5 at 0x400856
+
+Breakpoint 2, 0x00000000004007c9 in ?? ()
+
+Breakpoint 5, 0x0000000000400856 in ?? ()
+
+Breakpoint 1, 0x0000000000400881 in ?? ()
+
+Breakpoint 4, 0x00000000004008eb in ?? ()
+
+Breakpoint 4, 0x00000000004008eb in ?? ()
+
+Breakpoint 4, 0x00000000004008eb in ?? ()
+
+Breakpoint 4, 0x00000000004008eb in ?? ()
+
+Breakpoint 4, 0x00000000004008eb in ?? ()
+
+Breakpoint 4, 0x00000000004008eb in ?? ()
+
+Breakpoint 4, 0x00000000004008eb in ?? ()
+
+Breakpoint 4, 0x00000000004008eb in ?? ()
+[Inferior 1 (process 4473) exited normally]
+(gdb) quit

