@@ -1,0 +1,5 @@
+Downloaded debian with 3.2.04 build (7.10 Wheezy)
+readelf -a what.ko #Shows the file being originally called dummy4.c
+insmod what.ko #Load the kernel module
+lsmod #This will print all modules, sees that dummy4 is loaded
+cat /var/log/kern.log #Print the kernel messages, see flag

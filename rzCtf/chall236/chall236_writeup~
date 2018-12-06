@@ -1,0 +1,836 @@
+#Snider
+#Rebate As a Service - Challenge 236
+
+The challenge starts off by giving the binary "rebate". I run a quick file command on the binary to check file type.
+
+---------------------------------------------------------------------------
+$file rebate
+rebate: ELF 64-bit LSB  executable, x86-64, version 1 (SYSV), statically linked, stripped
+
+---------------------------------------------------------------------------
+
+After running "rebate" the output is as follows:
+
+---------------------------------------------------------------------------
+$ ./rebate 
+Rebate As A Service
+
+Enter your rebate code:ABCD
+
+Invalid rebate code. Please submit a valid one.
+
+---------------------------------------------------------------------------
+
+Looks like the binary wants a code of some sort.
+
+The rebate file shows to be elf64. I then ran a readelf to do some double checking for shenanigans as readelf is a good indicator for further problems especially if normal sections are missing from the executable.
+
+---------------------------------------------------------------------------
+$ readelf -a rebate
+ELF Header:
+  Magic:   7f 45 4c 46 02 01 01 00 00 00 00 00 00 00 00 00 
+  Class:                             ELF64
+  Data:                              2's complement, little endian
+  Version:                           1 (current)
+  OS/ABI:                            UNIX - System V
+  ABI Version:                       0
+  Type:                              EXEC (Executable file)
+  Machine:                           Advanced Micro Devices X86-64
+  Version:                           0x1
+  Entry point address:               0x400080
+  Start of program headers:          64 (bytes into file)
+  Start of section headers:          1216 (bytes into file)
+  Flags:                             0x0
+  Size of this header:               64 (bytes)
+  Size of program headers:           56 (bytes)
+  Number of program headers:         1
+  Size of section headers:           64 (bytes)
+  Number of section headers:         3
+  Section header string table index: 2
+
+Section Headers:
+  [Nr] Name              Type             Address           Offset
+       Size              EntSize          Flags  Link  Info  Align
+  [ 0]                   NULL             0000000000000000  00000000
+       0000000000000000  0000000000000000           0     0     0
+  [ 1] .text             PROGBITS         0000000000400080  00000080
+       0000000000000428  0000000000000000 WAX       0     0     16
+  [ 2] .shstrtab         STRTAB           0000000000000000  000004a8
+       0000000000000011  0000000000000000           0     0     1
+Key to Flags:
+  W (write), A (alloc), X (execute), M (merge), S (strings), l (large)
+  I (info), L (link order), G (group), T (TLS), E (exclude), x (unknown)
+  O (extra OS processing required) o (OS specific), p (processor specific)
+
+There are no section groups in this file.
+
+Program Headers:
+  Type           Offset             VirtAddr           PhysAddr
+                 FileSiz            MemSiz              Flags  Align
+  LOAD           0x0000000000000080 0x0000000000400080 0x0000000000400080
+                 0x0000000000000428 0x0000000000000428  RWE    10
+
+ Section to Segment mapping:
+  Segment Sections...
+   00     .text 
+
+There is no dynamic section in this file.
+
+There are no relocations in this file.
+
+The decoding of unwind sections for machine type Advanced Micro Devices X86-64 is not currently supported.
+
+No version information found in this file.
+
+---------------------------------------------------------------------------
+
+
+Yep, looks like shenanigans are afoot here. I decided to crack open the binary in gdb and came to the conclusion that the binary is obfuscated or at least takes indirect routes at executing specific instructions.
+
+My first thought was to let the binary do alot of the heavy lifting for me and to use code coverage and read and write watches to probe the code for where the binary is doing the character checking scheme.
+
+I decided to use a instruction tracking pin-tool from the tools folder that Intel provides with the pin executable.
+*https://software.intel.com/en-us/articles/pin-a-dynamic-binary-instrumentation-tool
+
+Unfortunately the instruction tracker Intel provides is crazy loud because the tool will literally follow every assembly instruction that runs within the current context in the binary. So I went ahead and made some modifications that forced the tool to only track instructions that occur within the .text section. I also went ahead and added another piece on top that would track when read and writes would occur in memory based on block analysis.
+
+A snippet of the output from the tool is below
+---------------------------------------------------------------------------
+40031a
+ : mov ebx, dword ptr [rdx+r12*1]
+40031e
+ : sub ebx, dword ptr [rax+r12*4+0x4]
+400323
+ : xor ebx, dword ptr [rax+r12*4+0x8]
+400328
+ : xor ebx, dword ptr [rax+r12*4+0xc]
+40032d
+ : jnz 0x40038a
+: R 0x7ffcab9094a8 
+: R 0x4001d2 
+: R 0x4001d6 
+: R 0x4001da 
+40038a
+ : call 0x4003cd
+: W 0x7ffcab909498 
+4003cd
+ : mov eax, 0x1
+4003d2
+ : mov rdi, rax
+4003d5
+ : pop rsi
+4003d6
+ : mov edx, 0x31
+4003db
+ : syscall 
+: R 0x7ffcab909498 
+4003dd
+ : call 0x400470
+: W 0x7ffcab909498 
+400470
+ : xor rax, rax
+400473
+ : mov al, 0x3c
+400475
+ : syscall 
+#eof
+---------------------------------------------------------------------------
+
+As you see above at the line 0x40031a a very interesting set of instructions plays out.
+
+---------------------------------------------------------------------------
+40031a
+ : mov ebx, dword ptr [rdx+r12*1]
+40031e
+ : sub ebx, dword ptr [rax+r12*4+0x4]
+400323
+ : xor ebx, dword ptr [rax+r12*4+0x8]
+400328
+ : xor ebx, dword ptr [rax+r12*4+0xc]
+40032d
+ : jnz 0x40038a
+: R 0x7ffcab9094a8 
+: R 0x4001d2 
+: R 0x4001d6 
+: R 0x4001da
+
+---------------------------------------------------------------------------
+
+After opening rebate once again in gdb I set a breakpoint on 0x40031a using the below gdb script. 
+
+*test.gdb
+---------------------------------------------------------------------------
+set disassembly-flavor intel
+set height 0
+set width 0
+
+b* 0x40031a
+commands 1
+end
+---------------------------------------------------------------------------
+
+*Running rebate with test.gdb
+---------------------------------------------------------------------------
+$ gdb rebate -quiet -command=test.gdb
+Reading symbols from rebate...(no debugging symbols found)...done.
+Breakpoint 1 at 0x40031a
+(gdb) r
+Starting program: /home/sneaky/Documents/ringzeroteam/rebate 
+Rebate As A Service
+
+Enter your rebate code:ABCD
+
+Breakpoint 1, 0x000000000040031a in ?? ()
+(gdb) x/5i $pc
+=> 0x40031a:	mov    ebx,DWORD PTR [rdx+r12*1]
+   0x40031e:	sub    ebx,DWORD PTR [rax+r12*4+0x4]
+   0x400323:	xor    ebx,DWORD PTR [rax+r12*4+0x8]
+   0x400328:	xor    ebx,DWORD PTR [rax+r12*4+0xc]
+   0x40032d:	jne    0x40038a
+(gdb) x/xw $rdx+$r12*1
+0x7fffffffdd38:	0x05dffe10
+(gdb) x/3xw $rax+$r12*4+0x4
+0x4001d2:	0x1dc823d6	0xb5ce105c	0xc631ca66
+(gdb)
+
+---------------------------------------------------------------------------
+
+Looks like the value in [rdx+r12*1] is being used in such a way to check whether or not the register ebx will become zero after a few operations using sub and xor.
+
+After running the program a few times, [rax+r12*4+0x4], [rax+r12*4+0x8], and [rax+r12*4+0xc] seem to be hard-coded, and that altering our input the value in [rdx+r12*1] is changing. This means that all we have to do now is track down where the mathematical operations are being done on [rdx+r12*1] and we find our way to getting a valid rebate code.
+
+Using the previous output from the tracking pin-tool I notice that there is only one stack read operation from the address "0x7ffcab9094a8"
+
+*Copy of pin-tool output
+---------------------------------------------------------------------------
+40031a
+ : mov ebx, dword ptr [rdx+r12*1]
+40031e
+ : sub ebx, dword ptr [rax+r12*4+0x4]
+400323
+ : xor ebx, dword ptr [rax+r12*4+0x8]
+400328
+ : xor ebx, dword ptr [rax+r12*4+0xc]
+40032d
+ : jnz 0x40038a
+: R 0x7ffcab9094a8 <- Stack read
+: R 0x4001d2 
+: R 0x4001d6 
+: R 0x4001da
+---------------------------------------------------------------------------
+
+So I just do a quick find on that operation in my output from the tracking script and come across only one place in the assembly that matches
+
+---------------------------------------------------------------------------
+40014b
+ : xor rsi, rsi
+40014e
+ : mov sil, byte ptr [rax+rdi*1]
+400152
+ : jmp 0x400163
+: R 0x7ffcab9094e8 
+400163
+ : call 0x400173
+: W 0x7ffcab9094a0 
+400173
+ : pop r12
+400175
+ : sub byte ptr [r12+0x27], 0xf0
+40017b
+ : mov word ptr [r12+0x2b], 0x9e6
+400183
+ : mov byte ptr [r12+0x12], 0x0
+400189
+ : jnz 0x40015b
+: R 0x7ffcab9094a0 
+: R 0x40018f 
+: W 0x40018f 
+: W 0x400193 
+: W 0x40017a 
+40015b
+ : shl rsi, 0xe
+40015f
+ : neg esi
+400161
+ : jmp 0x40018b
+40018b
+ : add si, word ptr [rax+rdi*1]
+40018f
+ : bswap esi
+400191
+ : shl rsi, 0x9
+400195
+ : add sil, cl
+400198
+ : call 0x4001ad
+: R 0x7ffcab9094e8 
+: W 0x7ffcab9094a0 
+4001ad
+ : xchg r15, rax
+4001af
+ : xchg rdx, r10
+4001b2
+ : jnz 0x4001b7
+4001b7
+ : mov eax, 0x4
+4001bc
+ : mov r12, rdi
+4001bf
+ : mul r12
+4001c2
+ : mov r12, rax
+4001c5
+ : xchg r10, rdx
+4001c8
+ : ret 
+: R 0x7ffcab9094a0 
+40019d
+ : mov dword ptr [rdx+r12*1], esi
+4001a1
+ : xchg r15, rax
+4001a3
+ : inc rdi
+4001a6
+ : loop 0x40014b
+: W 0x7ffcab9094a8 <- Matching stack address
+---------------------------------------------------------------------------
+
+Down here at the bottom of the output we see the "W" with the address "0x7ffcab9094a8" which means that this must be the location of where the actual write operation occurs.
+
+To confirm my suspicions I setup a breakpoint in gdb at the interesting line 0x40014e where a byte movement is occuring from what seems to be the stack.
+
+---------------------------------------------------------------------------
+(gdb) b* 0x40014e
+Breakpoint 2 at 0x40014e
+(gdb) r
+The program being debugged has been started already.
+Start it from the beginning? (y or n) y 
+Starting program: /home/sneaky/Documents/ringzeroteam/rebate 
+Rebate As A Service
+
+Enter your rebate code:ABCD
+
+Breakpoint 2, 0x000000000040014e in ?? ()
+(gdb) x/5i $pc
+=> 0x40014e:	mov    sil,BYTE PTR [rax+rdi*1]
+   0x400152:	jmp    0x400163
+   0x400154:	xor    sil,0x23
+   0x400158:	adc    dh,BYTE PTR [rbx+riz*1+0x48]
+   0x40015c:	shl    esi,0xe
+(gdb) x/s $rax+$rdi*1
+0x7fffffffdd78:	"ABCD\n"
+(gdb)
+---------------------------------------------------------------------------
+
+Well would you look at that. That is the input I fed into the program. So this means that this snippet of code found is definiately the source of the value that is used at the check near the end of the program.
+
+At this point what I did was then dump all the hard-coded values used in the check for ebx. I created a simple gdb script to do this. My assumption was that the only way to get to the next character check was that ebx needed to be zero. So I just set the eflags to make sure that the jne instruction went ahead and continued regardless of needing the correct character or not.
+
+*dump.gdb
+---------------------------------------------------------------------------
+set disassembly-flavor intel
+set height 0
+set width 0
+
+b* 0x40032d
+commands 1
+	x/3xw $rax+$r12*4+0x4
+	set $eflags = 0x246
+end
+---------------------------------------------------------------------------
+
+I then created a simple python function that would emulate the value needed given that the three arguments were fed into the function. This calculated value would be the one necessary to make ebx zero from the check found above.
+
+---------------------------------------------------------------------------
+def calcNeededValue(x,y,z):
+	#Calculates the required value to make it so that at each character check the value will be zero and continue the loop.
+	return (((y^z) + x) % 0x100000000)
+---------------------------------------------------------------------------
+
+From here my only thought was to now use the theorem-prover z3 as a means at finding the characters required to meet the values that would be calculated from the dumped memory.
+
+First I created a function that emulated the one that was being used to consume the characters from the string and create new values to be used in the ebx check. I also added a 32 bit swap to emulate the x86 bswap function.
+
+---------------------------------------------------------------------------
+def swap32(val):
+	"""
+		swap32 : The equivalent of x86 bswap
+	"""
+	return (((val<<24) & 0xff000000)|
+		((val<< 8) & 0x00ff0000)|
+		((val>> 8) & 0x0000ff00)|
+		((val>>24) & 0x000000ff))
+def verify(x,y,cl,target):
+	"""
+		verify: A replica of the algorithm used to calculate the necessary character per character check
+	"""
+	#xor rsi,rsi
+	rsi = 0
+
+	#mov sil, byte x
+	rsi = rsi | x
+
+	#shl rsi,0xe
+	rsi = rsi << 0xe
+
+	#neg esi
+	esi = rsi & 0x00000000ffffffff
+	esi = (~esi % 0x100000000)+1
+	rsi = esi
+
+	#add si, word ptr [rax+rdi*1] : This just seems to be the current character plus the next one over
+	si = rsi & 0x000000000000ffff
+	si = (si + y) % 0x10000
+	rsi = rsi & 0xffffffffffff0000
+	rsi = rsi | si
+	
+	#bswap esi
+	rsi = swap32(rsi)
+	
+	#shl rsi, 0x9
+	rsi = rsi << 0x9
+	
+	#add sil, cl
+	sil = rsi & 0x00000000000000ff
+	sil = (sil + cl) % 0x100
+	rsi = rsi & 0xffffffffffffff00
+	rsi = rsi | sil
+	
+	#mov dword ptr [rdx+r12*1], esi
+	rsi = rsi & 0x00000000ffffffff
+	
+	
+	return (rsi == target)
+---------------------------------------------------------------------------
+
+Once the verify function was complete I figured that the one who made the question probably kept the characters in the ascii range so I added a few checks for z3 to make the search a bit faster and less extensive. I also noticed that the creator was not only using one byte of the user input at a time, but also two bytes of the input were being used in the calculation.
+
+So xcheck is to make sure the byte is in ascii range, and ycheck makes sure that the upper bounds on the two bytes doesn't surpass 0x7f7f or otherwise z3 may take the cheap route and just go infinitely up the integer range.
+
+---------------------------------------------------------------------------
+def xcheck(x):
+	#z3 test that the byte argument "x" is within ascii range
+	return And(x <= 0x7f,x>=0x0)
+
+def ycheck(y):
+	#z3 test that the word argument "y" has both low and high bytes within ascii range
+	return And(y <= 0x7f7f,y>=0x0000)
+---------------------------------------------------------------------------
+
+The next check added was to constrain the two bytes consumed part of the equation. Since I knew that the beginning of the two bytes was the first byte consumed I added that as the xycheck for z3. 
+
+Another check I realized I could use was that in the next calculation the byte consumed would be apart of the pervious calculation and would thus constrain z3 further. This check is defined in the "backcheck" function.
+
+---------------------------------------------------------------------------
+def xycheck(x,y):
+	#z3 test that the word argument "y"'s lower byte consists of the byte argument "x"
+	z = y & 0x00ff
+	return z == x
+def backcheck(x,yprev):
+
+	#z3 check and see if the previous word argument "y"'s higher byte consists of the current argument "x"
+	check = yprev & 0xff00
+	check = check >> 8
+	return (x == check)
+---------------------------------------------------------------------------
+
+Now we put this all togerther and set up the z3 python script. I also added the get_models functions from a wiremask article as this would allow a simple way of continously adding new statements for z3 to solve without me having to add them individually in a long solve statement.
+
+*solution.py
+---------------------------------------------------------------------------
+from z3 import *
+def get_models(F):
+	"""
+		get_models : Takes an array of z3 arguments to test whether or not there is a solution to the problem
+	"""
+	result = []
+	s = Solver()
+	s.add(F)
+	while True:
+		if s.check() == sat:
+			m = s.model()
+			result.append(m)
+			print m
+			block = []
+			for d in m:
+				if d.arity() > 0:
+					raise Z3Exception("uninterpreted functions are not supported")
+				c = d()
+				if is_array(c) or c.sort().kind() == Z3_UNINTERPRETED_SORT:
+					raise Z3Exception("arrays and uninterpreted sorts are not supported")
+				block.append(c != m[d])
+			s.add(Or(block))
+		else:
+			return result
+def swap32(val):
+	"""
+		swap32 : The equivalent of x86 bswap
+	"""
+	return (((val<<24) & 0xff000000)|
+		((val<< 8) & 0x00ff0000)|
+		((val>> 8) & 0x0000ff00)|
+		((val>>24) & 0x000000ff))
+	
+def verify(x,y,cl,target):
+	"""
+		verify: A replica of the algorithm used to calculate the necessary character per character check
+	"""
+	#xor rsi,rsi
+	rsi = 0
+
+	#mov sil, byte x
+	rsi = rsi | x
+
+	#shl rsi,0xe
+	rsi = rsi << 0xe
+
+	#neg esi
+	esi = rsi & 0x00000000ffffffff
+	esi = (~esi % 0x100000000)+1
+	rsi = esi
+
+	#add si, word ptr [rax+rdi*1] : This just seems to be the current character plus the next one over
+	si = rsi & 0x000000000000ffff
+	si = (si + y) % 0x10000
+	rsi = rsi & 0xffffffffffff0000
+	rsi = rsi | si
+	
+	#bswap esi
+	rsi = swap32(rsi)
+	
+	#shl rsi, 0x9
+	rsi = rsi << 0x9
+	
+	#add sil, cl
+	sil = rsi & 0x00000000000000ff
+	sil = (sil + cl) % 0x100
+	rsi = rsi & 0xffffffffffffff00
+	rsi = rsi | sil
+	
+	#mov dword ptr [rdx+r12*1], esi
+	rsi = rsi & 0x00000000ffffffff
+	
+	
+	return (rsi == target)
+
+def xcheck(x):
+	#z3 test that the byte argument "x" is within ascii range
+	return And(x <= 0x7f,x>=0x0)
+
+def ycheck(y):
+	#z3 test that the word argument "y" has both low and high bytes within ascii range
+	return And(y <= 0x7f7f,y>=0x0000)
+
+def xycheck(x,y):
+	#z3 test that the word argument "y"'s lower byte consists of the byte argument "x"
+	z = y & 0x00ff
+	return z == x
+def backcheck(x,yprev):
+
+	#z3 check and see if the previous word argument "y"'s higher byte consts of the current argument "x"
+	check = yprev & 0xff00
+	check = check >> 8
+	return (x == check)
+
+def calcNeededValue(x,y,z):
+	#Calculates the required value to make it so that at each character check the value will be zero and continue the loop.
+	return (((y^z) + x) % 0x100000000)
+
+def main():
+	
+	#Instantiate all the Bit Vectors
+	x,y = BitVecs("b1 w1",32)
+	x1,y1 = BitVecs("b2 w2",32)
+	x2,y2 = BitVecs("b3 w3",32)
+	x3,y3 = BitVecs("b4 w4",32)
+	x4,y4 = BitVecs("b5 w5",32)
+	x5,y5 = BitVecs("b6 w6",32)
+	x6,y6 = BitVecs("b7 w7",32)
+	x7,y7 = BitVecs("b8 w8",32)
+	x8,y8 = BitVecs("b9 w9",32)
+	x9,y9 = BitVecs("b10 w10",32)
+	x10,y10 = BitVecs("b11 w11",32)
+	x11,y11 = BitVecs("b12 w12",32)
+	x12,y12 = BitVecs("b13 w13",32)
+	x13,y13 = BitVecs("b14 w14",32)
+	x14,y14 = BitVecs("b15 w15",32)
+	x15,y15 = BitVecs("b16 w16",32)
+
+	print "-"*15
+
+	#Setup all the z3 checks	
+	F = [
+		#First character/Second char
+		xcheck(x),
+		ycheck(y),
+		xycheck(x,y),
+		verify(x,y,16,0x91c7fe10), 
+
+		#Second character/Third char
+		xcheck(x1),
+		ycheck(y1),
+		xycheck(x1,y1),
+		backcheck(x1,y),
+		verify(x1,y1,15,0x63ddfe0f), 
+
+		#Third char/4th char
+		xcheck(x2),
+		ycheck(y2),
+		xycheck(x2,y2),
+		backcheck(x2,y1),
+		verify(x2,y2,14,calcNeededValue(0x11ae9151,0x3e1ba44a,0x6822c8f7)),
+
+		#4th/5th char
+		xcheck(x3),
+		ycheck(y3),
+		xycheck(x3,y3),
+		backcheck(x3,y2),
+		verify(x3,y3,13,calcNeededValue(0x12d43a8c,0xe5d2e1ea,0x2d21226b)),
+
+		#5th/6th char
+		xcheck(x4),
+		ycheck(y4),
+		xycheck(x4,y4),
+		backcheck(x4,y3),
+		verify(x4,y4,12,calcNeededValue(0x11ab27a8,0x319bafec,0x33a57988)),
+
+		#6th/7th char
+		xcheck(x5),
+		ycheck(y5),
+		xycheck(x5,y5),
+		backcheck(x5,y4),
+		verify(x5,y5,11,calcNeededValue(0x1bea2566,0x7e2222b7,0xb1d3fa12)),
+
+		#7th/8th char
+		xcheck(x6),
+		ycheck(y6),
+		xycheck(x6,y6),
+		backcheck(x6,y5),
+		verify(x6,y6,10,calcNeededValue(0x1d1331c8,0xc5936280,0xe741aec2)),
+
+		#8th/9th char
+		xcheck(x7),
+		ycheck(y7),
+		xycheck(x7,y7),
+		backcheck(x7,y6),
+		verify(x7,y7,9,calcNeededValue(0x1f30813e,0xf89f95e3,0xf03ee928)),
+
+		#9th/10th char
+		xcheck(x8),
+		ycheck(y8),
+		xycheck(x8,y8),
+		backcheck(x8,y7),
+		verify(x8,y8,8,calcNeededValue(0x18f05025,0x398b0954,0xf16ca4b7)),
+
+		#10th/11th char
+		xcheck(x9),
+		ycheck(y9),
+		xycheck(x9,y9),
+		backcheck(x9,y8),
+		verify(x9,y9,7,calcNeededValue(0x13d099c3,0x2f13adb2,0x650ac9f6)),
+
+		#11th/12th char
+		xcheck(x10),
+		ycheck(y10),
+		xycheck(x10,y10),
+		backcheck(x10,y9),
+		verify(x10,y10,6,calcNeededValue(0x15952b84,0xe040b7eb,0x68146569)),
+
+		#12th/13th char
+		xcheck(x11),
+		ycheck(y11),
+		xycheck(x11,y11),
+		backcheck(x11,y10),
+		verify(x11,y11,5,calcNeededValue(0x12cfe44c,0x9f3e19a0,0xc8340019)),
+		
+		#13th/14th char
+		xcheck(x12),
+		ycheck(y12),
+		xycheck(x12,y12),
+		backcheck(x12,y11),
+		verify(x12,y12,4,calcNeededValue(0x1510f74d,0xd5e62512,0x833123a5)),
+
+		#14th/15th char
+		xcheck(x13),
+		ycheck(y13),
+		xycheck(x13,y13),
+		backcheck(x13,y12),
+		verify(x13,y13,3,calcNeededValue(0x1a779885,0x31ebb46a,0x7e85d114)),
+
+		#15th/16th char
+		xcheck(x14),
+		ycheck(y14),
+		xycheck(x14,y14),
+		backcheck(x14,y13),
+		verify(x14,y14,2,calcNeededValue(0x1f411bf2,0x65c92edf,0xf14fcccf)),
+	
+		#16th char
+		xcheck(x15),
+		ycheck(y15),
+		xycheck(x15,y15),
+		backcheck(x15,y14),
+		verify(x15,y15,1,calcNeededValue(0x20f0dd5d,0xa00dcbf7,0xd4eeeb53))
+		
+	]
+	
+	
+	for x in get_models(F):
+		print(x)
+	
+	
+	pass
+main()
+---------------------------------------------------------------------------
+
+After running the above code the output should be:
+
+---------------------------------------------------------------------------
+$ python solution.py
+[w9 = 12371,
+ b14 = 53,
+ w2 = 12616,
+ w14 = 29749,
+ w4 = 11635,
+ b11 = 46,
+ w16 = 2649,
+ w13 = 13620,
+ b2 = 72,
+ w15 = 22900,
+ b6 = 73,
+ b8 = 95,
+ b4 = 115,
+ w11 = 20014,
+ w7 = 24373,
+ b7 = 53,
+ b3 = 49,
+ b16 = 89,
+ b9 = 83,
+ w8 = 21343,
+ w12 = 13390,
+ w6 = 13641,
+ b1 = 114,
+ b10 = 48,
+ w5 = 18733,
+ b15 = 116,
+ w1 = 18546,
+ b13 = 52,
+ b5 = 45,
+ b12 = 78,
+ w10 = 11824,
+ w3 = 29489]
+[w3 = 29489,
+ w9 = 12371,
+ w10 = 11824,
+ b5 = 45,
+ b12 = 78,
+ b13 = 52,
+ b15 = 116,
+ w5 = 18733,
+ b10 = 48,
+ b1 = 116,
+ w6 = 13641,
+ w12 = 13390,
+ w8 = 21343,
+ b9 = 83,
+ b16 = 89,
+ b3 = 49,
+ b7 = 53,
+ w7 = 24373,
+ w11 = 20014,
+ b8 = 95,
+ b4 = 115,
+ b6 = 73,
+ w15 = 22900,
+ b2 = 72,
+ w13 = 13620,
+ w16 = 2649,
+ b11 = 46,
+ w4 = 11635,
+ w14 = 29749,
+ w2 = 12616,
+ b14 = 53,
+ w1 = 18548]
+[w9 = 12371,
+ b14 = 53,
+ w2 = 12616,
+ w14 = 29749,
+ w4 = 11635,
+ b11 = 46,
+ w16 = 2649,
+ w13 = 13620,
+ b2 = 72,
+ w15 = 22900,
+ b6 = 73,
+ b8 = 95,
+ b4 = 115,
+ w11 = 20014,
+ w7 = 24373,
+ b7 = 53,
+ b3 = 49,
+ b16 = 89,
+ b9 = 83,
+ w8 = 21343,
+ w12 = 13390,
+ w6 = 13641,
+ b1 = 114,
+ b10 = 48,
+ w5 = 18733,
+ b15 = 116,
+ w1 = 18546,
+ b13 = 52,
+ b5 = 45,
+ b12 = 78,
+ w10 = 11824,
+ w3 = 29489]
+[w3 = 29489,
+ w9 = 12371,
+ w10 = 11824,
+ b5 = 45,
+ b12 = 78,
+ b13 = 52,
+ b15 = 116,
+ w5 = 18733,
+ b10 = 48,
+ b1 = 116,
+ w6 = 13641,
+ w12 = 13390,
+ w8 = 21343,
+ b9 = 83,
+ b16 = 89,
+ b3 = 49,
+ b7 = 53,
+ w7 = 24373,
+ w11 = 20014,
+ b8 = 95,
+ b4 = 115,
+ b6 = 73,
+ w15 = 22900,
+ b2 = 72,
+ w13 = 13620,
+ w16 = 2649,
+ b11 = 46,
+ w4 = 11635,
+ w14 = 29749,
+ w2 = 12616,
+ b14 = 53,
+ w1 = 18548]
+---------------------------------------------------------------------------
+
+It seems there were a few answers to the problem, but only one stands out as correct. Taking the b1 through b16 and converting them to ascii we get the flag.
+
+tH1s-I5_S0.N45tY
+
+Now the double check
+---------------------------------------------------------------------------
+$ ./rebate 
+Rebate As A Service
+
+Enter your rebate code:tH1s-I5_S0.N45tY
+
+Your rebate has been accepted. Please submit the following flag:
+tH1s-I5_S0.N45tY
+---------------------------------------------------------------------------
+
+Challenge complete.
+
+

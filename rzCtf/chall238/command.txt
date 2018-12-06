@@ -1,0 +1,1 @@
+radare2 -a nios2 -c=H <binary>

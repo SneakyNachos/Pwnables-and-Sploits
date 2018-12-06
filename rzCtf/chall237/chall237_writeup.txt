@@ -1,0 +1,296 @@
+@@Challenge 237 (ASM lovers) Writeup
+@@Snider
+
+The challenge starts you with a file "trivia.fun".
+
+After taking a couple of the first few bytes and dropping it into the online disassembler (https://www.onlinedisassembler.com/odaweb/) the bytes are valid x64 assembly.
+
+Next is to extract the bytes from "trivia.fun" as a C string for use in a later program
+
+Below is the Python script that will print the data as a usable C string:
+----------------------------------------------------------------------------------------------------------------------------------
+def main():
+	with open("trivia.fun","rb") as fp:
+		data = fp.read()  
+		output=""
+		for c in data:
+			output+="\\x%s"%hex(ord(c)).replace("0x","")
+		print output
+main()
+----------------------------------------------------------------------------------------------------------------------------------
+
+Then place the C string in a C file that will be used to execute the shellcode.
+
+Below is the final C code(test.c):
+----------------------------------------------------------------------------------------------------------------------------------
+#include <stdio.h>
+#include <string.h>
+
+unsigned char code [] = "\x8d\x05\xfa\xff\xff\xff\x04\x0a\xff\xe0\x48\x89\xe3\x48\xc1\xeb\x10\x48\x81\xf3\xff\xff\xff\x7f\xcc\x75\x19\x48\x31\xc0\xb0\x3c\x0f\x05\x41\xc1\xa1\x8c\x8e\x97\x8a\x97\x9f\xd3\x9f\x8d\x93\xd3\x9a\x8b\x92\xa1\x50\x48\x31\xc0\x48\x89\xc1\xb0\x22\x0f\x05\x48\x89\xca\x80\xc1\x10\x4c\x8d\x15\xd6\xff\xff\xff\x49\x83\xc2\x02\x41\xf6\x1c\x12\x48\x29\xc0\xb0\x22\x0f\x05\x48\xff\xc2\x49\x89\xd3\x49\x31\xcb\x75\xea\x48\x31\xc0\x48\xff\xc0\x48\x89\xc7\x4c\x89\xd6\x0f\x05\xe8\xa2\xff\xff\xff";
+
+void main(){
+        int (*ret)() = (int(*)())code; //Create a pointer to code
+        ret(); //Execute the shellcode
+}
+----------------------------------------------------------------------------------------------------------------------------------
+
+The compilation command below will allow us to execute the data without segfaulting on calling the shellcode via a function pointer using code:
+
+  $gcc -z execstack -fno-stack-protector -o test test.c
+
+After running the code once the output should look like:
+  $ ./test
+  $ Trace/breakpoint trap (core dumped)
+
+This means that they have anti-debugging techniques(int3) laced within the assembly code, and now further analysis will require a debugger.
+
+First I setup a gdb script to setup the initial environment, and to breakpoint on the very start of the main function.
+
+GDB initial script(test.gdb):
+----------------------------------------------------------------------------------------------------------------------------------
+set height 0
+set width 0
+set disassembly-flavor intel
+
+b* main
+commands 1
+end
+----------------------------------------------------------------------------------------------------------------------------------
+
+Now start up gdb using the command:
+  $ gdb --quiet test -command=test.gdb
+
+Now we see:
+----------------------------------------------------------------------------------------------------------------------------------
+$ gdb --quiet test -command=test.gdb
+Reading symbols from test...(no debugging symbols found)...done.
+Breakpoint 1 at 0x4004ed
+(gdb)
+----------------------------------------------------------------------------------------------------------------------------------
+
+Now we disasseble the main:
+----------------------------------------------------------------------------------------------------------------------------------
+(gdb) disassemble main
+Dump of assembler code for function main:
+   0x00000000004004ed <+0>:	push   rbp
+   0x00000000004004ee <+1>:	mov    rbp,rsp
+   0x00000000004004f1 <+4>:	sub    rsp,0x10
+   0x00000000004004f5 <+8>:	mov    QWORD PTR [rbp-0x8],0x601060
+   0x00000000004004fd <+16>:	mov    rdx,QWORD PTR [rbp-0x8]
+   0x0000000000400501 <+20>:	mov    eax,0x0
+   0x0000000000400506 <+25>:	call   rdx
+   0x0000000000400508 <+27>:	leave  
+   0x0000000000400509 <+28>:	ret    
+End of assembler dump.
+(gdb)
+----------------------------------------------------------------------------------------------------------------------------------
+
+We need to start the breakpoint on the location 0x400506 and then step into the next instruction to be in the shellcode:
+----------------------------------------------------------------------------------------------------------------------------------
+(gdb) b* main+25
+Breakpoint 2 at 0x400506
+(gdb) commands 2
+Type commands for breakpoint(s) 2, one per line.
+End with a line saying just "end".
+>si
+>end
+(gdb)
+----------------------------------------------------------------------------------------------------------------------------------
+
+Then start the program and now we should see the shellcode:
+----------------------------------------------------------------------------------------------------------------------------------
+(gdb) r
+Starting program: /home/sneaky/Documents/ringzeroCTF/Binary/chall237/test 
+
+Breakpoint 1, 0x00000000004004ed in main ()
+(gdb) c
+Continuing.
+
+Breakpoint 2, 0x0000000000400506 in main ()
+0x0000000000601060 in code ()
+(gdb) x/10i $pc
+=> 0x601060 <code>:	lea    eax,[rip+0xfffffffffffffffa]        # 0x601060 <code>
+   0x601066 <code+6>:	add    al,0xa
+   0x601068 <code+8>:	jmp    rax
+   0x60106a <code+10>:	mov    rbx,rsp
+   0x60106d <code+13>:	shr    rbx,0x10
+   0x601071 <code+17>:	xor    rbx,0x7fffffff
+   0x601078 <code+24>:	int3   
+   0x601079 <code+25>:	jne    0x601094 <code+52>
+   0x60107b <code+27>:	xor    rax,rax
+   0x60107e <code+30>:	mov    al,0x3c
+(gdb)
+----------------------------------------------------------------------------------------------------------------------------------
+
+The first thing to notice is that there's a int3 on line <code+24>(0x601078), which is probably the source of the Trap issue when running the program before.
+
+Before the int3 we see a couple of lines of assembly and a jump, but what we're looking at is dead code
+
+The first line will load into eax 0x601060, the beginning of the shellcode:
+----------------------------------------------------------------------------------------------------------------------------------
+lea    eax,[rip+0xfffffffffffffffa]        # 0x601060 <code> ; rax = 0x601060
+----------------------------------------------------------------------------------------------------------------------------------
+
+and then add 10, which will put eax at 0x60106a, and this will just place us just right after jmp instruction:
+----------------------------------------------------------------------------------------------------------------------------------
+add    al,0xa  ; rax = 0x60106a
+jmp    rax     ; jmp 0x60106a
+----------------------------------------------------------------------------------------------------------------------------------
+
+The next three instructions will also just zero out rbx
+----------------------------------------------------------------------------------------------------------------------------------
+0x60106a <code+10>:	mov    rbx,rsp  ; rbx = 0x7fffffffXXXXXXXX
+0x60106d <code+13>:	shr    rbx,0x10 ; rbx = 0x7fffffff
+0x601071 <code+17>:	xor    rbx,0x7fffffff ; rbx = 0
+----------------------------------------------------------------------------------------------------------------------------------
+
+Now we need to get past the int3, and the coming up jump. So what I do is just place a breakpoint on the int3, and then just set the program counter to <code+52>(0x601094)
+
+----------------------------------------------------------------------------------------------------------------------------------
+(gdb) b* 0x601078
+Breakpoint 3 at 0x601078
+(gdb) commands 3
+Type commands for breakpoint(s) 3, one per line.
+End with a line saying just "end".
+>set $pc=0x601094
+>end
+(gdb) c
+Continuing.
+
+Breakpoint 3, 0x0000000000601078 in code ()
+(gdb) x/10i $pc
+=> 0x601094 <code+52>:	push   rax
+   0x601095 <code+53>:	xor    rax,rax
+   0x601098 <code+56>:	mov    rcx,rax
+   0x60109b <code+59>:	mov    al,0x22
+   0x60109d <code+61>:	syscall 
+   0x60109f <code+63>:	mov    rdx,rcx
+   0x6010a2 <code+66>:	add    cl,0x10
+   0x6010a5 <code+69>:	lea    r10,[rip+0xffffffffffffffd6]        # 0x601082 <code+34>
+   0x6010ac <code+76>:	add    r10,0x2
+   0x6010b0 <code+80>:	neg    BYTE PTR [r10+rdx*1]
+(gdb)
+----------------------------------------------------------------------------------------------------------------------------------
+
+Now the next few instructions, at lines <code+52> to <code+61>, run a system call 34(pause). This would then cause issues because the system call pause would hang up the program waiting for SIGTERM to terminate the program.
+
+So now we add another breakpoint to just bypass the instruction and skip to the next line:
+----------------------------------------------------------------------------------------------------------------------------------
+(gdb) b* 0x60109d
+Breakpoint 4 at 0x60109d
+(gdb) commands 4
+Type commands for breakpoint(s) 4, one per line.
+End with a line saying just "end".
+>set $pc=0x60109f
+>end
+(gdb) c
+Continuing.
+
+Breakpoint 4, 0x000000000060109d in code ()
+(gdb) x/10i $pc
+=> 0x60109f <code+63>:	mov    rdx,rcx
+   0x6010a2 <code+66>:	add    cl,0x10
+   0x6010a5 <code+69>:	lea    r10,[rip+0xffffffffffffffd6]        # 0x601082 <code+34>
+   0x6010ac <code+76>:	add    r10,0x2
+   0x6010b0 <code+80>:	neg    BYTE PTR [r10+rdx*1]
+   0x6010b4 <code+84>:	sub    rax,rax
+   0x6010b7 <code+87>:	mov    al,0x22
+   0x6010b9 <code+89>:	syscall 
+   0x6010bb <code+91>:	inc    rdx
+   0x6010be <code+94>:	mov    r11,rdx
+(gdb)
+----------------------------------------------------------------------------------------------------------------------------------
+
+Now looking over the next few lines there's also another pause system call stuck at the bottom so now we go ahead and create another skip for that line as well:
+----------------------------------------------------------------------------------------------------------------------------------
+(gdb) b* 0x6010b9
+(gdb) commands 5
+Type commands for breakpoint(s) 5, one per line.
+End with a line saying just "end".
+>set $pc=0x6010bb
+>end
+(gdb) c
+Continuing.
+
+Breakpoint 5, 0x00000000006010b9 in code ()
+(gdb) x/10i $pc
+=> 0x6010bb <code+91>:	inc    rdx
+   0x6010be <code+94>:	mov    r11,rdx
+   0x6010c1 <code+97>:	xor    r11,rcx
+   0x6010c4 <code+100>:	jne    0x6010b0 <code+80>
+   0x6010c6 <code+102>:	xor    rax,rax
+   0x6010c9 <code+105>:	inc    rax
+   0x6010cc <code+108>:	mov    rdi,rax
+   0x6010cf <code+111>:	mov    rsi,r10
+   0x6010d2 <code+114>:	syscall 
+   0x6010d4 <code+116>:	call   0x60107b <code+27>
+(gdb)
+----------------------------------------------------------------------------------------------------------------------------------
+
+Now after this point and a bunch of continues on breakpoint 5 we should now see the flag print out.
+----------------------------------------------------------------------------------------------------------------------------------
+Breakpoint 5, 0x00000000006010b9 in code ()
+(gdb) c
+Continuing.
+
+Breakpoint 5, 0x00000000006010b9 in code ()
+(gdb) c
+Continuing.
+
+Breakpoint 5, 0x00000000006010b9 in code ()
+(gdb) c
+Continuing.
+
+Breakpoint 5, 0x00000000006010b9 in code ()
+(gdb) c
+Continuing.
+
+Breakpoint 5, 0x00000000006010b9 in code ()
+(gdb) c
+Continuing.
+
+Breakpoint 5, 0x00000000006010b9 in code ()
+(gdb) c
+Continuing.
+
+Breakpoint 5, 0x00000000006010b9 in code ()
+(gdb) c
+Continuing.
+
+Breakpoint 5, 0x00000000006010b9 in code ()
+(gdb) c
+Continuing.
+
+Breakpoint 5, 0x00000000006010b9 in code ()
+(gdb) c
+Continuing.
+
+Breakpoint 5, 0x00000000006010b9 in code ()
+(gdb) c
+Continuing.
+
+Breakpoint 5, 0x00000000006010b9 in code ()
+(gdb) c
+Continuing.
+
+Breakpoint 5, 0x00000000006010b9 in code ()
+(gdb) c
+Continuing.
+
+Breakpoint 5, 0x00000000006010b9 in code ()
+(gdb) c
+Continuing.
+
+Breakpoint 5, 0x00000000006010b9 in code ()
+(gdb) c
+Continuing.
+
+Breakpoint 5, 0x00000000006010b9 in code ()
+(gdb) c
+Continuing.
+_trivia-asm-fun_[Inferior 1 (process 4864) exited with code 01]
+(gdb)
+----------------------------------------------------------------------------------------------------------------------------------
+
+So what this means is that the trivia.fun shellcode had the string within the shellcode and then decoded it once all the anti-debugging tricks had been bypassed.
+

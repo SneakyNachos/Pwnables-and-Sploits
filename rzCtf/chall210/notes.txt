@@ -1,0 +1,6 @@
+
+target ^= 0x19c556d //0x471fbb1, thus the combination is made of 74578865
+target == 0x5edaedc
+
+After analysis it seems like the input just gets jumbled and then XOR'd flat.
+

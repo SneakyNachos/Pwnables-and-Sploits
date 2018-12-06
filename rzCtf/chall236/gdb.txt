@@ -1,0 +1,349 @@
+No symbol table loaded.  Use the "file" command.
+warning: ./commands.txt: No such file or directory
+Starting program: /home/sneaky/Documents/ringzeroCTF/Binary/chall236/rebate 
+[Inferior 1 (process 16692) exited with code 01]
+Continuing.
+[Inferior 1 (process 17021) exited with code 01]
+Value can't be converted to integer.
+No registers.
+Starting program: /home/sneaky/Documents/ringzeroCTF/Binary/chall236/rebate 
+
+Breakpoint 1, 0x0000000000400477 in ?? ()
+=> 0x400477:	call   0x400085
+   0x40047c:	rex js 0x4004f1
+   0x40047f:	jbe    0x4004eb
+   0x400481:	jl     0x4004bb
+   0x400483:	pop    rdx
+0x0000000000400085 in ?? ()
+=> 0x400085:	pop    rdi
+   0x400086:	call   0x40008b
+   0x40008b:	pop    rbx
+   0x40008c:	sub    rsp,0x64
+   0x400090:	mov    rax,rsp
+rax            0x0	0
+rbx            0x0	0
+rcx            0x0	0
+rdx            0x0	0
+rsi            0x0	0
+rdi            0x0	0
+rbp            0x0	0x0
+rsp            0x7fffffffdf08	0x7fffffffdf08
+r8             0x0	0
+r9             0x0	0
+r10            0x0	0
+r11            0x0	0
+r12            0x0	0
+r13            0x0	0
+r14            0x0	0
+r15            0x0	0
+Quit
+=> 0x400085:	pop    rdi
+   0x400086:	call   0x40008b
+   0x40008b:	pop    rbx
+   0x40008c:	sub    rsp,0x64
+   0x400090:	mov    rax,rsp
+0x7fffffffdf08:	0x0040047c	0x00000000	0x00000001	0x00000000
+0x0000000000400086 in ?? ()
+0x000000000040008b in ?? ()
+=> 0x40008b:	pop    rbx
+   0x40008c:	sub    rsp,0x64
+   0x400090:	mov    rax,rsp
+   0x400093:	call   0x4000a8
+   0x400098:	xor    al,0x39
+0x000000000040008c in ?? ()
+0x0000000000400090 in ?? ()
+0x0000000000400093 in ?? ()
+=> 0x400093:	call   0x4000a8
+   0x400098:	xor    al,0x39
+   0x40009a:	jb     0x400071
+   0x40009c:	ret    
+   0x40009d:	add    rcx,rdi
+0x00000000004000a8 in ?? ()
+=> 0x4000a8:	mov    BYTE PTR [rip+0x24],0x12        # 0x4000d3
+   0x4000af:	xor    rcx,rcx
+   0x4000b2:	mov    ecx,0x2c
+   0x4000b7:	mov    edx,0x0
+   0x4000bc:	mov    sil,BYTE PTR [edx+0x40047c]
+=> 0x4000a8:	mov    BYTE PTR [rip+0x24],0x12        # 0x4000d3
+   0x4000af:	xor    rcx,rcx
+   0x4000b2:	mov    ecx,0x2c
+   0x4000b7:	mov    edx,0x0
+   0x4000bc:	mov    sil,BYTE PTR [edx+0x40047c]
+0x00000000004000af in ?? ()
+=> 0x4000af:	xor    rcx,rcx
+   0x4000b2:	mov    ecx,0x2c
+   0x4000b7:	mov    edx,0x0
+   0x4000bc:	mov    sil,BYTE PTR [edx+0x40047c]
+   0x4000c4:	mov    BYTE PTR [rbx+0x3e],sil
+0x00000000004000b2 in ?? ()
+0x00000000004000b7 in ?? ()
+0x00000000004000bc in ?? ()
+=> 0x4000bc:	mov    sil,BYTE PTR [edx+0x40047c]
+   0x4000c4:	mov    BYTE PTR [rbx+0x3e],sil
+   0x4000c8:	mov    edi,0x0
+   0x4000cd:	sub    rdi,rdx
+   0x4000d0:	xor    rdi,0x12
+rax            0x7fffffffdeac	140737488346796
+rbx            0x40008b	4194443
+rcx            0x2c	44
+rdx            0x0	0
+rsi            0x0	0
+rdi            0x40047c	4195452
+rbp            0x0	0x0
+rsp            0x7fffffffdea4	0x7fffffffdea4
+r8             0x0	0
+r9             0x0	0
+r10            0x0	0
+r11            0x0	0
+r12            0x0	0
+r13            0x0	0
+r14            0x0	0
+r15            0x0	0
+Quit
+=> 0x4000bc:	mov    sil,BYTE PTR [edx+0x40047c]
+   0x4000c4:	mov    BYTE PTR [rbx+0x3e],sil
+   0x4000c8:	mov    edi,0x0
+   0x4000cd:	sub    rdi,rdx
+   0x4000d0:	xor    rdi,0x12
+0x00000000004000c4 in ?? ()
+=> 0x4000c4:	mov    BYTE PTR [rbx+0x3e],sil
+   0x4000c8:	mov    edi,0x0
+   0x4000cd:	sub    rdi,rdx
+   0x4000d0:	xor    rdi,0x12
+   0x4000d7:	jno    0x4000dc
+0x40:	Cannot access memory at address 0x40
+rax            0x7fffffffdeac	140737488346796
+rbx            0x40008b	4194443
+rcx            0x2c	44
+rdx            0x0	0
+rsi            0x40	64
+rdi            0x40047c	4195452
+rbp            0x0	0x0
+rsp            0x7fffffffdea4	0x7fffffffdea4
+r8             0x0	0
+r9             0x0	0
+r10            0x0	0
+r11            0x0	0
+r12            0x0	0
+r13            0x0	0
+r14            0x0	0
+r15            0x0	0
+Quit
+=> 0x4000c4:	mov    BYTE PTR [rbx+0x3e],sil
+   0x4000c8:	mov    edi,0x0
+   0x4000cd:	sub    rdi,rdx
+   0x4000d0:	xor    rdi,0x12
+   0x4000d7:	jno    0x4000dc
+0x00000000004000c8 in ?? ()
+=> 0x4000c8:	mov    edi,0x40
+   0x4000cd:	sub    rdi,rdx
+   0x4000d0:	xor    rdi,0x12
+   0x4000d7:	jno    0x4000dc
+   0x4000d9:	push   rsp
+0x00000000004000cd in ?? ()
+0x00000000004000d0 in ?? ()
+0x00000000004000d7 in ?? ()
+=> 0x4000d7:	jno    0x4000dc
+   0x4000d9:	push   rsp
+   0x4000da:	add    BYTE PTR [eax-0x78],al
+   0x4000de:	cmp    al,ch
+   0x4000e0:	or     eax,DWORD PTR [rax]
+0x00000000004000dc in ?? ()
+=> 0x4000dc:	mov    BYTE PTR [rax],dil
+   0x4000df:	call   0x4000ef
+   0x4000e4:	leave  
+   0x4000e5:	ret    
+   0x4000e6:	call   0x400119
+0x00000000004000df in ?? ()
+0x00000000004000ef in ?? ()
+=> 0x4000ef:	inc    rax
+   0x4000f2:	inc    edx
+   0x4000f4:	loop   0x4000bc
+   0x4000f6:	mov    rsi,rax
+   0x4000f9:	sub    rsi,0x31
+rax            0x7fffffffdeac	140737488346796
+rbx            0x40008b	4194443
+rcx            0x2c	44
+rdx            0x0	0
+rsi            0x40	64
+rdi            0x52	82
+rbp            0x0	0x0
+rsp            0x7fffffffde9c	0x7fffffffde9c
+r8             0x0	0
+r9             0x0	0
+r10            0x0	0
+r11            0x0	0
+r12            0x0	0
+r13            0x0	0
+r14            0x0	0
+r15            0x0	0
+Quit
+=> 0x4000ef:	inc    rax
+   0x4000f2:	inc    edx
+   0x4000f4:	loop   0x4000bc
+   0x4000f6:	mov    rsi,rax
+   0x4000f9:	sub    rsi,0x31
+0x00000000004000f2 in ?? ()
+0x00000000004000f4 in ?? ()
+=> 0x4000f4:	loop   0x4000bc
+   0x4000f6:	mov    rsi,rax
+   0x4000f9:	sub    rsi,0x31
+   0x4000fd:	xor    rax,rax
+   0x400100:	call   0x400124
+0x00000000004000bc in ?? ()
+=> 0x4000bc:	mov    sil,BYTE PTR [edx+0x40047c]
+   0x4000c4:	mov    BYTE PTR [rbx+0x3e],sil
+   0x4000c8:	mov    edi,0x40
+   0x4000cd:	sub    rdi,rdx
+   0x4000d0:	xor    rdi,0x12
+Breakpoint 2 at 0x40047c
+Continuing.
+[Inferior 1 (process 17706) exited with code 01]
+Breakpoint 3 at 0x4000bc
+Starting program: /home/sneaky/Documents/ringzeroCTF/Binary/chall236/rebate 
+
+Breakpoint 1, 0x0000000000400477 in ?? ()
+Continuing.
+
+Breakpoint 3, 0x00000000004000bc in ?? ()
+=> 0x4000bc:	mov    sil,BYTE PTR [edx+0x40047c]
+   0x4000c4:	mov    BYTE PTR [rbx+0x3e],sil
+   0x4000c8:	mov    edi,0x0
+   0x4000cd:	sub    rdi,rdx
+   0x4000d0:	xor    rdi,0x12
+rax            0x7fffffffdeac	140737488346796
+rbx            0x40008b	4194443
+rcx            0x2c	44
+rdx            0x0	0
+rsi            0x0	0
+rdi            0x40047c	4195452
+rbp            0x0	0x0
+rsp            0x7fffffffdea4	0x7fffffffdea4
+r8             0x0	0
+r9             0x0	0
+r10            0x0	0
+r11            0x0	0
+r12            0x0	0
+r13            0x0	0
+r14            0x0	0
+r15            0x0	0
+Quit
+rax            0x7fffffffdeac	140737488346796
+rbx            0x40008b	4194443
+rcx            0x2c	44
+rdx            0x0	0
+rsi            0x0	0
+rdi            0x40047c	4195452
+rbp            0x0	0x0
+rsp            0x7fffffffdea4	0x7fffffffdea4
+r8             0x0	0
+r9             0x0	0
+r10            0x0	0
+r11            0x0	0
+r12            0x0	0
+r13            0x0	0
+r14            0x0	0
+r15            0x0	0
+Quit
+=> 0x4000bc:	mov    sil,BYTE PTR [edx+0x40047c]
+   0x4000c4:	mov    BYTE PTR [rbx+0x3e],sil
+   0x4000c8:	mov    edi,0x0
+   0x4000cd:	sub    rdi,rdx
+   0x4000d0:	xor    rdi,0x12
+0x40008b:	0xec83485b
+   0x4000c9:	add    BYTE PTR [rax],al
+   0x4000cb:	add    BYTE PTR [rax],al
+   0x4000cd:	sub    rdi,rdx
+   0x4000d0:	xor    rdi,0x12
+   0x4000d7:	jno    0x4000dc
+Breakpoint 4 at 0x4000c9
+Continuing.
+
+Breakpoint 3, 0x00000000004000bc in ?? ()
+Continuing.
+
+Breakpoint 3, 0x00000000004000bc in ?? ()
+Continuing.
+
+Breakpoint 3, 0x00000000004000bc in ?? ()
+Continuing.
+
+Breakpoint 3, 0x00000000004000bc in ?? ()
+Continuing.
+
+Breakpoint 3, 0x00000000004000bc in ?? ()
+Continuing.
+
+Breakpoint 3, 0x00000000004000bc in ?? ()
+Continuing.
+
+Breakpoint 3, 0x00000000004000bc in ?? ()
+Continuing.
+
+Breakpoint 3, 0x00000000004000bc in ?? ()
+Continuing.
+
+Breakpoint 3, 0x00000000004000bc in ?? ()
+Continuing.
+
+Breakpoint 3, 0x00000000004000bc in ?? ()
+Continuing.
+
+Breakpoint 3, 0x00000000004000bc in ?? ()
+Continuing.
+
+Breakpoint 3, 0x00000000004000bc in ?? ()
+Continuing.
+
+Breakpoint 3, 0x00000000004000bc in ?? ()
+Continuing.
+[Inferior 1 (process 18235) exited with code 01]
+No registers.
+Starting program: /home/sneaky/Documents/ringzeroCTF/Binary/chall236/rebate 
+
+Breakpoint 1, 0x0000000000400477 in ?? ()
+=> 0x400477:	call   0x400085
+   0x40047c:	rex js 0x4004f1
+   0x40047f:	jbe    0x4004eb
+   0x400481:	jl     0x4004bb
+   0x400483:	pop    rdx
+0x0000000000400085 in ?? ()
+=> 0x400085:	pop    rdi
+   0x400086:	call   0x40008b
+   0x40008b:	pop    rbx
+   0x40008c:	sub    rsp,0x64
+   0x400090:	mov    rax,rsp
+0x0000000000400086 in ?? ()
+Breakpoint 5 at 0x40008b
+Continuing.
+
+Breakpoint 5, 0x000000000040008b in ?? ()
+=> 0x40008b:	pop    rbx
+   0x40008c:	sub    rsp,0x64
+   0x400090:	mov    rax,rsp
+   0x400093:	call   0x4000a8
+   0x400098:	xor    al,0x39
+Breakpoint 6 at 0x4000a8
+Continuing.
+
+Breakpoint 6, 0x00000000004000a8 in ?? ()
+=> 0x4000a8:	mov    BYTE PTR [rip+0x24],0x12        # 0x4000d3
+   0x4000af:	xor    rcx,rcx
+   0x4000b2:	mov    ecx,0x2c
+   0x4000b7:	mov    edx,0x0
+   0x4000bc:	mov    sil,BYTE PTR [edx+0x40047c]
+   0x4000c4:	mov    BYTE PTR [rbx+0x3e],sil
+   0x4000c8:	mov    edi,0x0
+   0x4000cd:	sub    rdi,rdx
+   0x4000d0:	xor    rdi,0xde
+   0x4000d7:	jno    0x4000dc
+   0x4000d9:	push   rsp
+   0x4000da:	add    BYTE PTR [eax-0x78],al
+   0x4000de:	cmp    al,ch
+   0x4000e0:	or     eax,DWORD PTR [rax]
+   0x4000e2:	add    BYTE PTR [rax],al
+A debugging session is active.
+
+	Inferior 1 [process 18411] will be killed.
+
+Quit anyway? (y or n) 
